@@ -9,10 +9,29 @@ import "container/list"
 // key to the Map function, as in the paper; only a value,
 // which is a part of the input file contents
 func Map(value string) *list.List {
+	notLetter := func(r rune) bool {
+		return !unicode.IsLetter(r)
+	}
+	fields := strings.FieldsFunc(value, notLetter)
+
+	l := list.New()
+	for _, f := range fields {
+		kv := mapreduce.KeyValue{Key: f, Value: "1"}
+		l.PushBack(kv)
+	}
+	return l
 }
 
 // iterate over list and add values
 func Reduce(key string, values *list.List) string {
+	count := 0
+	// iterate over list
+	for e := values.Front(); e != nil; e = e.Next() {
+		v := e.Value.(string)
+		intValue, _ := strconv.Atoi(v)
+		count += intValue
+	}
+	return strconv.Itoa(count)
 }
 
 // Can be run in 3 ways:
